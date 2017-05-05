@@ -1,0 +1,7 @@
+{
+  "name": "polydiscs",
+  "short_name": "polydiscs",
+  "description": "Browse your discogs collection",
+  "start_url": "/",
+  "display": "standalone"
+}
