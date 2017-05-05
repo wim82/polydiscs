@@ -1,0 +1,37 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<!--<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">-->
+<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+
+<dom-module id="disc-grid">
+    <template>
+        <style>
+             :host {
+                display: block;
+            }
+        </style>
+        <ul>
+          <template is="dom-repeat" items="{{discs}}">
+            <li>
+              [[item]]
+            </li>
+          </template>
+        </ul>
+    </template>
+
+    <script>
+        /** @polymerElement */
+        class Discgrid extends Polymer.Element {
+            static get is() { return 'disc-grid'; }
+            static get properties() {
+                return {
+                    discs: {
+                        type: Array,
+                        value: ['washing machine', 'insignificance', 'laughing stock']
+                    }
+                };
+            }
+        }
+
+        window.customElements.define(Discgrid.is, Discgrid);
+    </script>
+</dom-module>
