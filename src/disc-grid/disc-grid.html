@@ -1,37 +1,76 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <!--<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">-->
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
 
 <dom-module id="disc-grid">
-    <template>
-        <style>
-             :host {
-                display: block;
-            }
-        </style>
-        <ul>
-          <template is="dom-repeat" items="{{discs}}">
-            <li>
-              [[item]]
-            </li>
-          </template>
-        </ul>
-    </template>
+  <template>
+    <style>
+       :host {
+        display: block;
+      }
+    </style>
+    <ul>
+      <template is="dom-repeat" items="{{releases}}" as="release">
+        <li>
+          <img src="[[release.thumb]]" />
+        </li>
+      </template>
+    </ul>
 
-    <script>
-        /** @polymerElement */
-        class Discgrid extends Polymer.Element {
-            static get is() { return 'disc-grid'; }
-            static get properties() {
-                return {
-                    discs: {
-                        type: Array,
-                        value: ['washing machine', 'insignificance', 'laughing stock']
-                    }
-                };
-            }
+    <iron-ajax id="discogsReleases" url="https://api.discogs.com/users/wim82/collection/folders/39994/releases"
+      handle-as="json" headers="{{getHeaders()}}" debounce-duration="300" on-response="handleResponse"></iron-ajax>
+  </template>
+
+
+  <script src="../../config.js"></script>
+  <script>
+    /** @polymerElement */
+    class DiscGrid extends Polymer.Element {
+      constructor() {
+        super();
+        this.releases = [];
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
+        this.$.discogsReleases.generateRequest();
+      }
+      
+      static get is() { return 'disc-grid'; }
+      static get properties() {
+        return {
+          discs: {
+            type: Array,
+            value: ['washing machine', 'insignificance', 'laughing stock']
+          }
+        };
+      }
+
+      getHeaders() {
+        if (!discogsToken) {
+          throw 'You need to specify your discogs token in order for this to work. Working on proper authentication is on the roadmap.'
         }
 
-        window.customElements.define(Discgrid.is, Discgrid);
-    </script>
+        return {
+          Authorization: "Discogs token=" + discogsToken
+        }
+      }
+
+      handleResponse(e) {
+        this.releases = e.detail.response.releases.map((release) => {
+          return {
+            thumb: release.basic_information.thumb,
+            title: release.basic_information.title,
+            artist: release.basic_information.artists.reduce((artist, item, index, arr) => {
+              var join = arr.length - 1 !== index ? item.join : '';
+              return artist + item.name + ' ' + join + ' ';
+            }, '')
+          }
+        });
+      }
+    }
+
+    window.customElements.define(DiscGrid.is, DiscGrid);
+  </script>
 </dom-module>
