@@ -5,6 +5,8 @@
 <link rel="import" href="../../bower_components/app-layout/app-toolbar/app-toolbar.html">
 <link rel="import" href="../../bower_components/app-layout/app-scroll-effects/app-scroll-effects.html">
 <link rel="import" href="../../bower_components/paper-styles/color.html">
+<link rel="import" href="../../bower_components/platinum-sw/platinum-sw-register.html">
+<link rel="import" href="../../bower_components/platinum-sw/platinum-sw-cache.html">
 
 <!--<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">-->
 <!--<link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">-->
@@ -25,6 +27,10 @@
         padding: 10px;
       }
     </style>
+
+    <platinum-sw-register auto-register>
+      <platinum-sw-cache default-cache-strategy="fastest"></platinum-sw-cache>
+    </platinum-sw-register>
 
     <app-header-layout>
       <app-header slot="header" fixed condenses effects="waterfall">

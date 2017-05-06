@@ -41,7 +41,13 @@
       </template>
     </ul>
 
-    <iron-ajax id="discogsReleases" url="https://api.discogs.com/users/wim82/collection/folders/39994/releases"
+    <!-- refactor this into a custom element that displays everything from cache first, then fetches everything from the server
+as long as the pagination continues -->
+    <iron-ajax id="request1" url="https://api.discogs.com/users/wim82/collection/folders/39994/releases?per_page=100&page=1"
+      handle-as="json" headers="{{getHeaders()}}" debounce-duration="300" on-response="handleResponse"></iron-ajax>
+    <iron-ajax id="request2" url="https://api.discogs.com/users/wim82/collection/folders/39994/releases?per_page=100&page=2"
+      handle-as="json" headers="{{getHeaders()}}" debounce-duration="300" on-response="handleResponse"></iron-ajax>
+    <iron-ajax id="request3" url="https://api.discogs.com/users/wim82/collection/folders/39994/releases?per_page=100&page=3"
       handle-as="json" headers="{{getHeaders()}}" debounce-duration="300" on-response="handleResponse"></iron-ajax>
   </template>
 
@@ -54,7 +60,9 @@
       connectedCallback() {
         super.connectedCallback();
         this.releases = [];
-        this.$.discogsReleases.generateRequest();
+        this.$.request1.generateRequest();
+        this.$.request2.generateRequest();
+        this.$.request3.generateRequest();
       }
 
       static get is() { return 'disc-grid'; }
@@ -78,7 +86,7 @@
       }
 
       handleResponse(e) {
-        this.releases = e.detail.response.releases.map((release) => {
+        this.releases = this.releases.concat(e.detail.response.releases.map((release) => {
           return {
             thumb: release.basic_information.thumb,
             title: release.basic_information.title,
@@ -87,7 +95,7 @@
               return artist + item.name + ' ' + join + ' ';
             }, '')
           }
-        });
+        })).slice().sort((a, b) => a.artist.localeCompare(b.artist));
       }
     }
 
