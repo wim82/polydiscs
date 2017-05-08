@@ -1,8 +1,8 @@
 <link rel="import" href="../../bower_components/polymer/polymer-element.html">
-<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="../../bower_components/app-layout/app-grid/app-grid-style.html">
 <!--<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">-->
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
+<link rel="import" href="../load-releases/load-releases.html">
 
 <dom-module id="disc-grid">
   <template>
@@ -33,26 +33,19 @@
         width: 100px;
       }
     </style>
+
+    <load-releases releases="{{releases}}"></load-releases>
+
     <ul class="app-grid">
-      <template is="dom-repeat" items="{{releases}}" as="release">
+      <template is="dom-repeat" items="[[releases]]" as="release">
         <li>
           <img class="record-cover" src="[[release.thumb]]" />
         </li>
       </template>
     </ul>
 
-    <!-- refactor this into a custom element that displays everything from cache first, then fetches everything from the server
-as long as the pagination continues -->
-    <iron-ajax id="request1" url="https://api.discogs.com/users/wim82/collection/folders/39994/releases?per_page=100&page=1"
-      handle-as="json" headers="{{getHeaders()}}" debounce-duration="300" on-response="handleResponse"></iron-ajax>
-    <iron-ajax id="request2" url="https://api.discogs.com/users/wim82/collection/folders/39994/releases?per_page=100&page=2"
-      handle-as="json" headers="{{getHeaders()}}" debounce-duration="300" on-response="handleResponse"></iron-ajax>
-    <iron-ajax id="request3" url="https://api.discogs.com/users/wim82/collection/folders/39994/releases?per_page=100&page=3"
-      handle-as="json" headers="{{getHeaders()}}" debounce-duration="300" on-response="handleResponse"></iron-ajax>
   </template>
 
-
-  <script src="../../config.js"></script>
   <script>
     /** @polymerElement */
     class DiscGrid extends Polymer.Element {
@@ -60,9 +53,6 @@ as long as the pagination continues -->
       connectedCallback() {
         super.connectedCallback();
         this.releases = [];
-        this.$.request1.generateRequest();
-        this.$.request2.generateRequest();
-        this.$.request3.generateRequest();
       }
 
       static get is() { return 'disc-grid'; }
@@ -73,29 +63,6 @@ as long as the pagination continues -->
             value: ['washing machine', 'insignificance', 'laughing stock']
           }
         };
-      }
-
-      getHeaders() {
-        if (!discogsToken) {
-          throw 'You need to specify your discogs token in order for this to work. Working on proper authentication is on the roadmap.'
-        }
-
-        return {
-          Authorization: "Discogs token=" + discogsToken
-        }
-      }
-
-      handleResponse(e) {
-        this.releases = this.releases.concat(e.detail.response.releases.map((release) => {
-          return {
-            thumb: release.basic_information.thumb,
-            title: release.basic_information.title,
-            artist: release.basic_information.artists.reduce((artist, item, index, arr) => {
-              var join = arr.length - 1 !== index ? item.join : '';
-              return artist + item.name + ' ' + join + ' ';
-            }, '')
-          }
-        })).slice().sort((a, b) => a.artist.localeCompare(b.artist));
       }
     }
 

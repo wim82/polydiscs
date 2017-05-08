@@ -1,0 +1,75 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="load-releases">
+  <template>
+    <iron-ajax id="request" url="https://api.discogs.com/users/wim82/collection/folders/39994/releases?per_page=100&page=1&sort=artist"
+      auto handle-as="json" headers="{{getHeaders()}}" on-response="handleResponse"></iron-ajax>
+  </template>
+
+  <script src="../../config.js"></script>
+  <script>
+    (function () {
+      /** @polymerElement */
+      class LoadReleases extends Polymer.Element {
+
+        connectedCallback() {
+          super.connectedCallback();
+        }
+
+        static get is() { return 'load-releases'; }
+        static get properties() {
+          return {
+            releases: {
+              type: Array,
+              notify: true,
+              value: []
+            }
+          };
+        }
+
+        getHeaders() {
+          if (!discogsToken) {
+            throw 'You need to specify your discogs token in order for this to work. Working on proper authentication is on the roadmap.'
+          }
+
+          return {
+            Authorization: "Discogs token=" + discogsToken
+          }
+        }
+
+        handleResponse(e) {
+          this.releases = this.releases
+            .concat(e.detail.response.releases.map(this._releaseFromResponse))
+            .slice() //trick to get an immutable sort
+            .sort(this._sortByArtistThenTitle);
+
+          if (e.detail.response.pagination.urls.next) {
+            this.$.request.url = e.detail.response.pagination.urls.next;
+          }
+        }
+
+        _releaseFromResponse(release) {
+          return {
+            thumb: release.basic_information.thumb,
+            title: release.basic_information.title,
+            artist: release.basic_information.artists
+              .reduce((artist, item, index, arr) => {
+                var join = arr.length - 1 !== index ? item.join : '';
+                return artist + item.name + ' ' + join + ' ';
+              }, '')
+          }
+        }
+        _sortByArtistThenTitle(a, b) {
+          if (a.artist !== b.artist) {
+            return a.artist.localeCompare(b.artist);
+          } else {
+            return a.title.localeCompare(b.title);
+          }
+        }
+      }
+
+      window.customElements.define(LoadReleases.is, LoadReleases);
+    })();
+  </script>
+</dom-module>
