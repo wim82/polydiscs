@@ -7,6 +7,10 @@
 <link rel="import" href="../../bower_components/paper-styles/color.html">
 <link rel="import" href="../../bower_components/platinum-sw/platinum-sw-register.html">
 <link rel="import" href="../../bower_components/platinum-sw/platinum-sw-cache.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../disc-detail/disc-detail.html">
 
 <dom-module id="polydiscs-app">
   <template>
@@ -29,6 +33,9 @@
       <platinum-sw-cache default-cache-strategy="fastest"></platinum-sw-cache>
     </platinum-sw-register>
 
+    <app-location route="{{route}}"></app-location>
+    <app-route route="{{route}}" pattern="/:page" data="{{routeData}}"></app-route>
+
     <app-header-layout>
       <app-header slot="header" fixed condenses effects="waterfall">
         <app-toolbar>
@@ -36,7 +43,11 @@
         </app-toolbar>
       </app-header>
       <div content>
-        <disc-grid></disc-grid>
+        <iron-pages attr-for-selected="id" selected="{{routeData.page}}" fallback-selection="404">
+          <disc-detail id="detail"></disc-detail>
+          <disc-grid id=""></disc-grid>
+          <div id="404">How 'bout no. 4 to the floor, it's a 4O4!</div>
+        </iron-pages>
       </div>
     </app-header-layout>
   </template>

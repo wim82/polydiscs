@@ -1,0 +1,30 @@
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+
+<dom-module id="disc-detail">
+  <template>
+    <style>
+       :host {
+        display: block;
+      }
+    </style>
+
+    <app-location route="{{route}}"></app-location>
+    <app-route route="{{route}}" pattern="/detail/:disc" data="{{data}}"></app-route>
+
+    <h1>Disc Detail</h1>
+    <h2>{{data.disc}}</h2>
+
+  </template>
+
+  <script>
+    /** @polymerElement */
+    class DiscDetail extends Polymer.Element {
+
+      static get is() { return 'disc-detail'; }
+    }
+
+    window.customElements.define(DiscDetail.is, DiscDetail);
+  </script>
+</dom-module>
