@@ -45,7 +45,7 @@
       <div content>
         <iron-pages attr-for-selected="id" selected="{{routeData.page}}" fallback-selection="404">
           <disc-detail id="detail"></disc-detail>
-          <disc-grid id=""></disc-grid>
+          <disc-grid id="" on-selected="passRelease"></disc-grid>
           <div id="404">How 'bout no. 4 to the floor, it's a 4O4!</div>
         </iron-pages>
       </div>
@@ -63,6 +63,10 @@
             value: 'polydiscs'
           }
         };
+      }
+
+      passRelease(release){
+        console.log('this release is amazing', release);
       }
     }
 

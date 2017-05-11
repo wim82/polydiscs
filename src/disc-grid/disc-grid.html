@@ -3,6 +3,7 @@
 <!--<link rel="import" href="../../bower_components/polymer/lib/elements/dom-if.html">-->
 <link rel="import" href="../../bower_components/polymer/lib/elements/dom-repeat.html">
 <link rel="import" href="../load-releases/load-releases.html">
+<link rel="import" href="../../bower_components/polymer/lib/mixins/gesture-event-listeners.html">
 
 <dom-module id="disc-grid">
   <template>
@@ -38,7 +39,7 @@
 
     <ul class="app-grid">
       <template is="dom-repeat" items="[[releases]]" as="release">
-        <li>
+        <li on-tap="goToRelease">
           <img class="record-cover" src="[[release.thumb]]" />
         </li>
       </template>
@@ -48,7 +49,7 @@
 
   <script>
     /** @polymerElement */
-    class DiscGrid extends Polymer.Element {
+    class DiscGrid extends Polymer.GestureEventListeners(Polymer.Element) {
 
       connectedCallback() {
         super.connectedCallback();
@@ -63,6 +64,10 @@
             value: ['washing machine', 'insignificance', 'laughing stock']
           }
         };
+      }
+
+      goToRelease(e) {
+        this.dispatchEvent(new CustomEvent('selected', { detail: e.model.get('release') }));
       }
     }
 
